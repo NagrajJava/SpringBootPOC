@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.mongo.dto.ResponseDTO;
 import com.mongo.model.User;
-import com.mongo.model.UserMaster;
+import com.mongo.model.UserDetails;
 
 public abstract class Validations {
 	private static final Logger log = LoggerFactory.getLogger(Validations.class);
@@ -55,11 +55,11 @@ public abstract class Validations {
 		return valid;
 	}
 
-	public boolean validateUserMaster(UserMaster usermaster) {
+	public boolean validateUserMaster(UserDetails userDetails) {
 		boolean valid = false;
-		log.info("usermaster details ->{}", usermaster);
-		if (usermaster.getUserName() != null && usermaster.getPassword() != null && usermaster.getAddress() != null
-				&& isvalidFirstName(usermaster.getUserName())) {
+		log.info("usermaster details ->{}", userDetails);
+		if (userDetails.getUserName() != null && userDetails.getPassword() != null && userDetails.getAddress() != null
+				&& isvalidFirstName(userDetails.getUserName())) {
 			valid = true;
 		}
 		return valid;
@@ -68,18 +68,18 @@ public abstract class Validations {
 	public boolean validateUser(User user) {
 		boolean valid = false;
 		log.info("user details ->{}", user);
-		if (user.getFirstName() != null && user.getLastName() != null && user.getEmailId() != null
+		if (user.getFirstName() != null && user.getLastName() != null && user.getEmail() != null
 				&& isvalidFirstName(user.getFirstName()) && isvalidLastName(user.getLastName())) {
 			valid = true;
 		}
 		return valid;
 	}
 	
-	public boolean validateUserId(Integer id) {
-		boolean valid = false;
+	public boolean validateUserId(String id) {
+		boolean valid = true;
 		log.info("userId ->{}", id);
-		if (id !=null ) {
-			valid = true;
+		if (id.isEmpty()) {
+			valid = false;
 		}
 		return valid;
 	}
@@ -101,10 +101,10 @@ public abstract class Validations {
 		return new ResponseEntity<Object>(responseDTO, HttpStatus.OK);
 	}
 
-	public ResponseEntity<Object> responseBuildermaster(Object usermaster) throws Exception {
+	public ResponseEntity<Object> responseBuildermaster(Object userDetails) throws Exception {
 		ResponseDTO responseDTO = new ResponseDTO();
 		responseDTO.setMsg(Constants.SUCCESS_MESSAGE);
-		responseDTO.setData(usermaster);
+		responseDTO.setData(userDetails);
 		responseDTO.setStatuscode(HttpStatus.OK.value());
 		return new ResponseEntity<Object>(responseDTO, HttpStatus.OK);
 	}
@@ -112,14 +112,15 @@ public abstract class Validations {
 	public ResponseEntity<Object> responseBuildersearchByProperty(Object searchDTO) throws Exception {
 		ResponseDTO responseDTO = new ResponseDTO();
 		responseDTO.setMsg(Constants.SEARCH_SUCCESS_MESSAGE);
-		responseDTO.setData(responseDTO);
+		responseDTO.setData(searchDTO);
 		responseDTO.setStatuscode(HttpStatus.OK.value());
 		return new ResponseEntity<Object>(responseDTO, HttpStatus.OK);
 	}
 
-	public ResponseEntity<Object> responseBuilderUpdateuser(Object usermaster) throws Exception {
+	public ResponseEntity<Object> responseBuilderUpdateuser(Object user) throws Exception {
 		ResponseDTO responseDTO = new ResponseDTO();
 		responseDTO.setMsg(Constants.SUCCESS_UPDATE_MESSAGE);
+		responseDTO.setData(user);
 		responseDTO.setStatuscode(HttpStatus.OK.value());
 		return new ResponseEntity<Object>(responseDTO, HttpStatus.OK);
 	}
@@ -137,7 +138,7 @@ public abstract class Validations {
 	 */
 	public ResponseEntity<Object> responseBuilder(Exception exc) {
 		ResponseDTO responseDTO = new ResponseDTO();
-		responseDTO.setMsg(Constants.FAIL_SEARCH_MESSAGE);
+		responseDTO.setMsg(Constants.FAIL_MESSAGE);
 		responseDTO.setData(Boolean.FALSE);
 		responseDTO.setStatuscode(HttpStatus.NOT_FOUND.value());
 

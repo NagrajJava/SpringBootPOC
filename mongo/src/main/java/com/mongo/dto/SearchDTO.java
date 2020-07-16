@@ -5,7 +5,7 @@ import javax.validation.constraints.Pattern;
 
 public class SearchDTO {
 
-	private Integer id;
+	private String id;
 	@Pattern(regexp = "^[A-Za-z0-9+.!#$%&'*+-/?^_`{ |-]+@[A-Za-z0-9.-]+$", message = "Invalid email id format.")
 	@NotEmpty
 	private String emailId;
@@ -37,11 +37,11 @@ public class SearchDTO {
 	private String pincode;
 
 	
-	public Integer getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

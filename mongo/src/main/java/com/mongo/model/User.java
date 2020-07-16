@@ -2,53 +2,62 @@ package com.mongo.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.TypeAlias;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document(collection = "Userdetails")
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@Document(collection = "Users")
 @TypeAlias("user")
 public class User {
 
 	@Id
-	private Integer userid;
-    @Field("firstName")
+	@JsonProperty("userid")
+	private String userid;
+
+	@JsonProperty("firstname")
 	private String firstName;
-    @Field("lastName")
+
+	@JsonProperty("lastname")
 	private String lastName;
-    @Field("emailId")
-	private String emailId;
-    @Field("mobileNo")
-	private String mobileNo;
 
-	private Boolean isActive = true;
+	@JsonProperty("email")
+	private String email;
 
-	private UserMaster usermaster;
+	@JsonProperty("mobile")
+	private String mobile;
 
-	public User(Integer userid, String firstName, String lastName, String emailId, String mobileNo, Boolean isActive,
-			UserMaster usermaster) {
+	//@DBRef
+	private Address address;
+
+	public User() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public User(String userid, String firstName, String lastName, String email, String mobile, Address address) {
 		super();
 		this.userid = userid;
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.emailId = emailId;
-		this.mobileNo = mobileNo;
-		this.isActive = isActive;
-		this.usermaster = usermaster;
+		this.email = email;
+		this.mobile = mobile;
+		this.address = address;
 	}
 
-	public UserMaster getUsermaster() {
-		return usermaster;
+	public Address getAddress() {
+		return address;
 	}
 
-	public void setUsermaster(UserMaster usermaster) {
-		this.usermaster = usermaster;
+	public void setAddress(Address address) {
+		this.address = address;
 	}
 
-	public Integer getUserid() {
+	public String getUserid() {
 		return userid;
 	}
 
-	public void setUserid(Integer userid) {
+	public void setUserid(String userid) {
 		this.userid = userid;
 	}
 
@@ -68,28 +77,77 @@ public class User {
 		this.lastName = lastName;
 	}
 
-	public String getEmailId() {
-		return emailId;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setEmailId(String emailId) {
-		this.emailId = emailId;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
-	public String getMobileNo() {
-		return mobileNo;
+	public String getMobile() {
+		return mobile;
 	}
 
-	public void setMobileNo(String mobileNo) {
-		this.mobileNo = mobileNo;
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
 	}
 
-	public Boolean getIsActive() {
-		return isActive;
-	}
-
-	public void setIsActive(Boolean isActive) {
-		this.isActive = isActive;
-	}
-
+	/*
+	 * private Date createddate;
+	 * 
+	 * private Date updateddate;
+	 * 
+	 * private Boolean isActive = true;
+	 * 
+	 * @DBRef private UserDetails userDetails;
+	 * 
+	 * 
+	 * public User() { super(); // TODO Auto-generated constructor stub }
+	 * 
+	 * public User(String userid, String firstName, String lastName, String emailId,
+	 * String mobileNo, Boolean isActive, UserDetails userDetails) { super();
+	 * this.userid = userid; this.firstName = firstName; this.lastName = lastName;
+	 * this.emailId = emailId; this.mobileNo = mobileNo; this.isActive = isActive;
+	 * this.userDetails = userDetails; }
+	 * 
+	 * public String getUserid() { return userid; }
+	 * 
+	 * public void setUserid(String userid) { this.userid = userid; }
+	 * 
+	 * public String getFirstName() { return firstName; }
+	 * 
+	 * public void setFirstName(String firstName) { this.firstName = firstName; }
+	 * 
+	 * public String getLastName() { return lastName; }
+	 * 
+	 * public void setLastName(String lastName) { this.lastName = lastName; }
+	 * 
+	 * public String getEmailId() { return emailId; }
+	 * 
+	 * public void setEmailId(String emailId) { this.emailId = emailId; }
+	 * 
+	 * public String getMobileNo() { return mobileNo; }
+	 * 
+	 * public void setMobileNo(String mobileNo) { this.mobileNo = mobileNo; }
+	 * 
+	 * public Boolean getIsActive() { return isActive; }
+	 * 
+	 * public void setIsActive(Boolean isActive) { this.isActive = isActive; }
+	 * 
+	 * public Date getCreateddate() { return createddate; }
+	 * 
+	 * public void setCreateddate(Date createddate) { this.createddate =
+	 * createddate; }
+	 * 
+	 * public Date getUpdateddate() { return updateddate; }
+	 * 
+	 * public void setUpdateddate(Date updateddate) { this.updateddate =
+	 * updateddate; }
+	 * 
+	 * public UserDetails getUserDetails() { return userDetails; }
+	 * 
+	 * public void setUserDetails(UserDetails userDetails) { this.userDetails =
+	 * userDetails; }
+	 */
 }

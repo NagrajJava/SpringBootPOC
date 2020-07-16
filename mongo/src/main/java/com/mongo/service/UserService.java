@@ -1,10 +1,13 @@
 package com.mongo.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.mongo.dto.SearchDTO;
+import com.mongo.model.Address;
+import com.mongo.model.Education;
 import com.mongo.model.User;
-import com.mongo.model.UserMaster;
+import com.mongo.model.UserDetails;
 
 public interface UserService {
 
@@ -12,12 +15,18 @@ public interface UserService {
 
 	List<User> getAllUsers();
 
-	boolean deleteuserById(Integer id);
+	boolean deleteuserById(String id);
 
-	boolean updateUser(User user, int id);
+	boolean updateUser(User user, String id);
 
-	boolean saveUserMaster(UserMaster usermaster);
+	boolean saveUserMaster(UserDetails userDetails);
 
-	List<User> searchByProperty(SearchDTO searchDTO);
+	List<User> searchByProperty(String email);
+	
+	 Optional<User>  searchByPropertyuserId(String userId);
+
+	boolean saveUseraddress(Address useraddres);
+
+	boolean saveUsereducation(Education education);
 
 }

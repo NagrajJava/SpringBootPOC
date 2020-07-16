@@ -3,11 +3,14 @@ package com.mongo.model;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-public class UserMaster {
+@Document("UserDetails")
+public class UserDetails {
 
 	@Id
-	private Integer masterId;
+	private String masterId;
 
 	private String userName;
 
@@ -15,8 +18,10 @@ public class UserMaster {
 
 	private Boolean isActive = true;
 
+	@DBRef
 	private List<Address> address;
-
+    
+	@DBRef
 	private Education education;
 
 	public List<Address> getAddress() {
@@ -35,11 +40,11 @@ public class UserMaster {
 		this.education = education;
 	}
 
-	public Integer getMasterId() {
+	public String getMasterId() {
 		return masterId;
 	}
 
-	public void setMasterId(Integer masterId) {
+	public void setMasterId(String masterId) {
 		this.masterId = masterId;
 	}
 
