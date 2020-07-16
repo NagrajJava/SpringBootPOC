@@ -3,7 +3,7 @@ package com.UserDetailsPOC.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,13 +12,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.UserDetailsPOC.comons.CustomException;
+import com.UserDetailsPOC.comons.ValidationUtils;
 import com.UserDetailsPOC.constants.Constants;
+import com.UserDetailsPOC.constants.ValidationCheck;
 import com.UserDetailsPOC.dto.DynamicSeachDTO;
 import com.UserDetailsPOC.dto.ResponseDTO;
 import com.UserDetailsPOC.entity.UserEntity;
@@ -27,17 +31,14 @@ import com.UserDetailsPOC.service.UserService;
 
 @RestController
 @RequestMapping("/user")
-public class UserController {
+public class UserController extends ValidationCheck {
 	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
 	@Autowired
 	public UserService service;
 
-	/**
-	 * This API is used for Health Check
-	 * 
-	 * @return String
-	 */
+	ValidationUtils validateUtils = new ValidationUtils();
+
 	@GetMapping("/healthCheck")
 	public String healthCheck() {
 
@@ -48,22 +49,51 @@ public class UserController {
 	/**
 	 * This API is used for is used to save the Data of User Master
 	 * 
-	 * @return ResponseEntity<String> message
+	 * @return ResponseEntity<Object> message
 	 */
+
+	@PostMapping("/saveUser")
+	public ResponseEntity<Object> saveUser(@Valid @RequestBody UserEntity user) {
+		ResponseEntity<Object> response = null;
+
+		try {
+			response = validateUser(user) ? responseBuilder(service.saveUser(user)) : null;
+		} catch (Exception e) {
+			response = responseBuilder(e);
+		}
+		return response;
+	}
+
+	@PostMapping("/saveUserMaster")
+	public ResponseEntity<Object> saveUserMaster(@Valid @RequestBody UserMasterEntity userMaster) {
+		ResponseEntity<Object> response = null;
+
+		try {
+			response = validateUserMaster(userMaster) ? responseBuilder(service.saveUserMaster(userMaster)) : null;
+		} catch (Exception e) {
+			response = responseBuilder(e);
+		}
+		return response;
+	}
+
 	@RequestMapping("/getAllusers")
 	public ResponseDTO<List<UserEntity>> getAllUsers() {
-		logger.info("Inside getAllUsers Method");
-		List<UserEntity> list = new ArrayList<>();
+
+		logger.info("Inside getAllUsers method");
 		ResponseDTO<List<UserEntity>> responseDTO = new ResponseDTO<List<UserEntity>>();
-		list = service.fetchAllUsers();
-		if (!list.isEmpty()) {
-			responseDTO.setData(list);
-			responseDTO.setMessage(Constants.SUCCESS_MESSAGE);
-			responseDTO.setStatusCode(HttpStatus.OK.value());
-		} else {
-			responseDTO.setMessage(Constants.FAIL_GET_MESSAGE);
+		List<UserEntity> userlist = service.fetchAllUsers();
+		if (userlist == null) {
+			logger.warn("No user records found");
+			responseDTO.setData(userlist);
 			responseDTO.setStatusCode(HttpStatus.NOT_FOUND.value());
+			responseDTO.setMessage(Constants.FAIL_GET_MESSAGE);
+			return responseDTO;
+			// new HttpClientErrorException(HttpStatus.BAD_REQUEST, "No user records
+			// found");
 		}
+		responseDTO.setData(userlist);
+		responseDTO.setStatusCode(HttpStatus.OK.value());
+		responseDTO.setMessage(Constants.SEARCH_SUCCESS_MESSAGE);
 		return responseDTO;
 	}
 
@@ -72,55 +102,34 @@ public class UserController {
 	 * 
 	 * @return ResponseEntity<String> message
 	 */
-	@RequestMapping(value = "/userMasterRegistration", method = RequestMethod.POST)
-	public ResponseEntity<ResponseDTO> saveUserMasterInfo(@RequestBody UserMasterEntity usermasterEntity,
-			HttpServletResponse httpServletResponse) {
-		logger.info("Inside saveUserMasterInfo..");
-		ResponseDTO responseDTO = new ResponseDTO();
-		int httpStatusCode;
-		if (service.saveUserMaster(usermasterEntity)) {
-			httpStatusCode = HttpStatus.OK.value();
-			responseDTO.setStatusCode(httpStatusCode);
-			responseDTO.setMessage(Constants.SUCCESS_MESSAGE);
-
-		} else {
-			httpStatusCode = HttpStatus.BAD_REQUEST.value();
-			responseDTO.setStatusCode(httpStatusCode);
-			responseDTO.setMessage(Constants.FAIL_MESSAGE);
-		}
-		responseDTO.setStatusCode(httpStatusCode);
-		httpServletResponse.setStatus(httpStatusCode);
-
-		return new ResponseEntity<ResponseDTO>(responseDTO, HttpStatus.OK);
-
-	}
+	/*
+	 * @RequestMapping(value = "/Saveusermaster", method = RequestMethod.POST)
+	 * public ResponseEntity<String> saveUserMasterInfo(@Valid @RequestBody
+	 * UserMasterEntity usermasterEntity) throws CustomException{
+	 * logger.info("Inside saveUserMasterInfo.."); try {
+	 * 
+	 * if(!service.saveUserMaster(usermasterEntity)) return new
+	 * ResponseEntity<>(Constants.VALIDATION_FAIL_MESSAGE, HttpStatus.BAD_REQUEST);
+	 * } catch (Exception e) { throw new
+	 * CustomException("User Master Not Saved!!!"); }
+	 * 
+	 * return new ResponseEntity<>(Constants.SUCCESS_MESSAGE, HttpStatus.OK);
+	 * 
+	 * }
+	 */
 
 	/**
-	 * This API is used for is used to updateUserDetailsById
+	 * This API is used for is used to save user Details
 	 * 
-	 * @return ResponseDTO<String> message
+	 * @return ResponseEntity<String> message
 	 */
 	@RequestMapping(value = "/saveuserdetails", method = RequestMethod.POST)
-	public ResponseEntity<ResponseDTO> saveUserInfo(@RequestBody UserEntity entity,
-			HttpServletResponse httpServletResponse) {
+	public ResponseEntity<String> saveUserInfo(@RequestBody UserEntity entity) {
 		logger.info("inside  saveUserInfo  method  ");
-		ResponseDTO responseDTO = new ResponseDTO();
-		int httpStatusCode;
-
-		if (service.saveUser(entity)) {
-			httpStatusCode = HttpStatus.OK.value();
-			responseDTO.setStatusCode(httpStatusCode);
-			responseDTO.setMessage(Constants.SUCCESS_MESSAGE);
-		} else {
-			httpStatusCode = HttpStatus.BAD_REQUEST.value();
-			responseDTO.setStatusCode(httpStatusCode);
-			responseDTO.setMessage(Constants.FAIL_MESSAGE);
+		if (!service.saveUser(entity)) {
+			return new ResponseEntity<>(Constants.VALIDATION_FAIL_MESSAGE, HttpStatus.BAD_REQUEST);
 		}
-		responseDTO.setStatusCode(httpStatusCode);
-		httpServletResponse.setStatus(httpStatusCode);
-
-		return new ResponseEntity<ResponseDTO>(responseDTO, HttpStatus.OK);
-
+		return new ResponseEntity<>(Constants.SUCCESS_MESSAGE, HttpStatus.OK);
 	}
 
 	/**
@@ -130,23 +139,28 @@ public class UserController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/updateUserDetailsById/{userId}", method = RequestMethod.PUT)
-	public ResponseDTO updateUserDetailsById(@RequestBody UserEntity entity, @PathVariable Integer userId)
-			throws Exception {
-		int httpStatusCode;
+	public ResponseEntity<String> updateUserDetailsById(@RequestBody UserEntity entity, @PathVariable Integer userId) {
 		logger.debug("UpdateUserDetailsById Method Execution Started");
-		ResponseDTO responseDTO = new ResponseDTO();
-		if (service.modifyUserDetails(entity, userId)) {
-			httpStatusCode = HttpStatus.OK.value();
-			responseDTO.setStatusCode(httpStatusCode);
-			responseDTO.setMessage(Constants.SUCCESS_UPDATE_MESSAGE);
-		} else {
-			httpStatusCode = HttpStatus.BAD_REQUEST.value();
-			responseDTO.setStatusCode(httpStatusCode);
-			responseDTO.setMessage(Constants.FAIL_MESSAGE);
+		if (service.UpdateUserDetails(entity, userId)) {
+			return new ResponseEntity<String>(Constants.FAIL_UPDATE_MESSAGE, HttpStatus.BAD_REQUEST);
 		}
 
-		return responseDTO;
+		return new ResponseEntity<String>(Constants.SUCCESS_UPDATE_MESSAGE, HttpStatus.OK);
 
+	}
+
+	/**
+	 * This API is used for deleteUserById
+	 * 
+	 * @return ResponseEntity<String> message
+	 */
+	@RequestMapping(value = "/deleteUserById/{userId}", method = RequestMethod.DELETE)
+	public ResponseEntity<String> deleteUserById(@PathVariable Integer userId) {
+		logger.info("Inside DeleteById Method");
+		if (!service.deleteUserById(userId)) {
+			return new ResponseEntity<String>(Constants.FAIL_DELETE_MESSAGE, HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<String>(Constants.SUCCESS_DELETE_MESSAGE, HttpStatus.OK);
 	}
 
 	/**
@@ -155,45 +169,14 @@ public class UserController {
 	 * @return users list
 	 */
 	@RequestMapping(value = "/searchByNameAndEmailId", method = RequestMethod.POST)
-	public ResponseDTO<List<UserEntity>> SearchUserByField(@RequestBody DynamicSeachDTO searchEntity)
-			throws CustomException {
+	public ResponseEntity<List<UserEntity>> SearchUserByField(@RequestBody DynamicSeachDTO searchEntity) {
 		logger.info("searchUser Method Execution Started");
 
 		List<UserEntity> list = new ArrayList<>();
 
-		ResponseDTO<List<UserEntity>> responseDTO = new ResponseDTO<>();
 		list = service.fetchUserByDySearch(searchEntity);
-		if (list.isEmpty()) {
-			responseDTO.setMessage(Constants.FAIL_SEARCH_MESSAGE);
-			responseDTO.setStatusCode(HttpStatus.NOT_FOUND.value());
+		return new ResponseEntity<List<UserEntity>>(list, HttpStatus.OK);
 
-		} else {
-			responseDTO.setData(list);
-			responseDTO.setMessage(Constants.SEARCH_SUCCESS_MESSAGE);
-			responseDTO.setStatusCode(HttpStatus.OK.value());
-		}
-
-		return responseDTO;
-	}
-
-	/**
-	 * This API is used for deleteUserById
-	 * 
-	 * @return ResponseEntity<ResponseDTO> message
-	 * @throws CustomException
-	 */
-	@RequestMapping(value = "/deleteUserById/{userId}", method = RequestMethod.DELETE)
-	public ResponseDTO<String> deleteUserById(@PathVariable Integer userId) {
-		logger.info("Inside DeleteById Method");
-		ResponseDTO<String> responseDTO = new ResponseDTO<>();
-		if (service.deleteUserById(userId)) {
-			responseDTO.setMessage(Constants.SUCCESS_DELETE_MESSAGE);
-			responseDTO.setStatusCode(HttpStatus.OK.value());
-		} else {
-			responseDTO.setMessage(Constants.FAIL_DELETE_MESSAGE);
-			responseDTO.setStatusCode(HttpStatus.NOT_FOUND.value());
-		}
-		return responseDTO;
 	}
 
 }

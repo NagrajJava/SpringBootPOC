@@ -23,69 +23,37 @@ import lombok.Data;
 public class UserEduEntity {
 
 	@Id
-	@Column(name="ureduid")
-	/*
-	 * @GeneratedValue(strategy = GenerationType.SEQUENCE, generator =
-	 * "userEdu_id_generator")
-	 * 
-	 * @SequenceGenerator(name="UserEdu_id_generator", initialValue =
-	 * 1,allocationSize = 1, sequenceName = "userEdu_id_seq")
-	 */
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
-	private Integer userEduId;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer EduId;
 	
-	@Column(name="userScName")
+	
 	@NotNull
-	private String userScName;
+	private String schoolName;
 	
-	@Column(name="userScCityName")
-	@NotNull
-	private String userScCityName;
-	
-	@Column(name="userClgName")
+		
 	@NotNull
 	private String userClgName;
 	
-	@Column(name="userBranchName")
 	@NotNull
 	private String userBranchName;
 	
-	@Column(name="UserClgCityNam")
 	@NotNull
 	private String UserClgCityName;
-	
-	@Column(name="createDate",updatable = false)
-	@CreationTimestamp
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date CreateDate;
-	
-	@Column(name="updateDate")
-	@UpdateTimestamp
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date updateDate;
 
-	public Integer getUserEduId() {
-		return userEduId;
+	public Integer getEduId() {
+		return EduId;
 	}
 
-	public void setUserEduId(Integer userEduId) {
-		this.userEduId = userEduId;
+	public void setEduId(Integer eduId) {
+		EduId = eduId;
 	}
 
-	public String getUserScName() {
-		return userScName;
+	public String getSchoolName() {
+		return schoolName;
 	}
 
-	public void setUserScName(String userScName) {
-		this.userScName = userScName;
-	}
-
-	public String getUserScCityName() {
-		return userScCityName;
-	}
-
-	public void setUserScCityName(String userScCityName) {
-		this.userScCityName = userScCityName;
+	public void setSchoolName(String schoolName) {
+		this.schoolName = schoolName;
 	}
 
 	public String getUserClgName() {
@@ -111,20 +79,8 @@ public class UserEduEntity {
 	public void setUserClgCityName(String userClgCityName) {
 		UserClgCityName = userClgCityName;
 	}
+	
 
-	public Date getCreateDate() {
-		return CreateDate;
-	}
+	
 
-	public void setCreateDate(Date createDate) {
-		CreateDate = createDate;
-	}
-
-	public Date getUpdateDate() {
-		return updateDate;
-	}
-
-	public void setUpdateDate(Date updateDate) {
-		this.updateDate = updateDate;
-	}
 }

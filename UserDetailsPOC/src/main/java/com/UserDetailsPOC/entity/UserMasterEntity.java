@@ -1,83 +1,55 @@
 package com.UserDetailsPOC.entity;
 
-import java.util.Date;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import lombok.Data;
 
 
 @Entity
 @Table(name="User_Master")
-public class UserMasterEntity {
+public class UserMasterEntity  extends BaseEntity{
 	
 	@Id
 	@Column(name="userM_id")
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Integer masterId;
 	
-	  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator =
-	  "userM_id_generator")
-	  
-	  @SequenceGenerator(name="UserM_id_generator", initialValue = 1,allocationSize
-	  = 1, sequenceName = "userM_id_seq")
-	 
-	 
-	//@GeneratedValue(strategy = GenerationType.SEQUENCE)
-	private Integer userMasterId;
-	
-	@NotNull(message = "please enter username")
+	@NotNull
 	@Column(name="userName")
 	private String userName;
 	
 
-	@NotNull(message = "please enter password")
+	@NotNull
 	@Column(name="password")
 	private String password;
 	
-	@Column(name="isActive")
 	private Boolean isActive=true;
 	
-	@Column(name="createDate",updatable = false)
-	@CreationTimestamp
-	private Date CreateDate;
-	
-	@Column(name="updateDate")
-	@UpdateTimestamp
-	private Date updateDate;
-	
-	@OneToMany(targetEntity = UserAddrsEntity.class,
-			cascade=CascadeType.ALL)
+	@OneToMany(targetEntity = UserAddrsEntity.class, cascade=CascadeType.ALL,fetch = FetchType.EAGER)
 	@JoinColumn(name="userMsAddId")
 	@Fetch(value=FetchMode.JOIN)
+	//@OneToMany
 	private Set<UserAddrsEntity> usersAddrs;
 	
-	@OneToMany(targetEntity = UserEduEntity.class,
-			cascade=CascadeType.ALL)
-	@JoinColumn(name="userMsEduId")
-	@Fetch(value=FetchMode.JOIN)
-	private Set<UserEduEntity> usersEducation;
-
 	public Integer getUserMasterId() {
-		return userMasterId;
+		return masterId;
 	}
 
 	public void setUserMasterId(Integer userMasterId) {
-		this.userMasterId = userMasterId;
+		this.masterId = userMasterId;
 	}
 
 	public String getUserName() {
@@ -104,22 +76,6 @@ public class UserMasterEntity {
 		this.isActive = isActive;
 	}
 
-	public Date getCreateDate() {
-		return CreateDate;
-	}
-
-	public void setCreateDate(Date createDate) {
-		CreateDate = createDate;
-	}
-
-	public Date getUpdateDate() {
-		return updateDate;
-	}
-
-	public void setUpdateDate(Date updateDate) {
-		this.updateDate = updateDate;
-	}
-
 	public Set<UserAddrsEntity> getUsersAddrs() {
 		return usersAddrs;
 	}
@@ -128,13 +84,6 @@ public class UserMasterEntity {
 		this.usersAddrs = usersAddrs;
 	}
 
-	public Set<UserEduEntity> getUsersEducation() {
-		return usersEducation;
-	}
-
-	public void setUsersEducation(Set<UserEduEntity> usersEducation) {
-		this.usersEducation = usersEducation;
-	}
 	
 	
 

@@ -6,6 +6,10 @@ public class DynamicSeachDTO  {
 	private Integer pincode;
 	private String email;
 	
+	public DynamicSeachDTO() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 	public DynamicSeachDTO(String firstName, String lastName, Integer pincode, String email) {
 		super();
 		this.firstName = firstName;

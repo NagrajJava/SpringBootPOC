@@ -1,11 +1,10 @@
 package com.UserDetailsPOC.dao;
 
-import java.io.Serializable;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.UserDetailsPOC.entity.UserMasterEntity;
 
-public interface UserMasterRepository  extends CrudRepository<UserMasterEntity, Serializable>{
+public interface UserMasterRepository  extends JpaRepository<UserMasterEntity, Integer>{
 
 }

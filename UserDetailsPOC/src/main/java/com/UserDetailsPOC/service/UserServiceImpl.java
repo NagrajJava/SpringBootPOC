@@ -1,21 +1,18 @@
 package com.UserDetailsPOC.service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+
+import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.UserDetailsPOC.comons.CustomException;
-import com.UserDetailsPOC.constants.Constants;
 import com.UserDetailsPOC.dao.UserMasterRepository;
 import com.UserDetailsPOC.dao.UserRepository;
 import com.UserDetailsPOC.dto.DynamicSeachDTO;
-import com.UserDetailsPOC.dto.ResponseDTO;
 import com.UserDetailsPOC.entity.UserEntity;
 import com.UserDetailsPOC.entity.UserMasterEntity;
 
@@ -25,13 +22,12 @@ public class UserServiceImpl implements UserService {
 	private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
 	@Autowired
-	private UserRepository repo;
+	private UserRepository userrepo;
 
 	@Autowired
-	private UserMasterRepository userasterRepo;
+	private UserMasterRepository usermasterRepo;
 
-	private UserMasterEntity urMasterEntity;
-
+	private UserMasterEntity userMaster = new UserMasterEntity();
 	/**
 	 * Fetching All Users
 	 *
@@ -39,7 +35,7 @@ public class UserServiceImpl implements UserService {
 	 */
 	public List<UserEntity> fetchAllUsers() {
 		logger.info("inside FetchAllUsers method");
-		List<UserEntity> usersList = (List<UserEntity>) repo.findAll();
+		List<UserEntity> usersList = (List<UserEntity>) userrepo.findAll();
 		return usersList;
 	}
 
@@ -51,9 +47,8 @@ public class UserServiceImpl implements UserService {
 	public Boolean saveUserMaster(UserMasterEntity usermasterEntity) {
 		logger.info("inside saveUserMaster method");
 		if (usermasterEntity.getUserName() != null) {
-			urMasterEntity = userasterRepo.save(usermasterEntity);
+			usermasterRepo.save(usermasterEntity);
 			return Boolean.TRUE;
-
 		}
 		return Boolean.FALSE;
 	}
@@ -64,10 +59,12 @@ public class UserServiceImpl implements UserService {
 	 * @param Entity class Object
 	 * @return message
 	 */
+	@Transactional
 	public Boolean saveUser(UserEntity entity) {
 		logger.info("inside saveUser method");
 		if (entity.getFirstName() != null) {
-			entity.setUserMasterEntity(urMasterEntity);
+			//entity.setUserMasterEntity(userMaster);
+			userrepo.save(entity);
 			return Boolean.TRUE;
 		}
 		return Boolean.FALSE;
@@ -76,16 +73,27 @@ public class UserServiceImpl implements UserService {
 	/**
 	 * Updating Particular User by UserId
 	 * 
-	 * @return message
+	 * @return Boolean
 	 */
-	public Boolean modifyUserDetails(UserEntity entity, Integer userId) {
+	public Boolean UpdateUserDetails(UserEntity entity, Integer userId) {
+		
 		if (userId != null) {
-			Optional<UserEntity> updateEntity = repo.findById(userId);
+			//Optional<UserEntity> updateEntity = userrepo.findById(userId);
+			//updateEntity.get().setUserid(1);
+			//userrepo.save(entity);
+			UserEntity updateEntity = new UserEntity();
+			Optional<UserEntity> updateEntity2 =null;
+			updateEntity2=userrepo.findById(userId);
+			updateEntity=updateEntity2.get();
+			System.out.println(" jj ----"+updateEntity);
+			userMaster=updateEntity.getUserMasterEntity();
+			if(userId!=null) {
 			entity.setUserid(userId);
-			entity.setUserMasterEntity(updateEntity.get().getUserMasterEntity());
-			repo.save(entity);
-
+			entity.setUserMasterEntity(userMaster);//entity set
+			updateEntity = userrepo.save(entity);
 			return Boolean.TRUE;
+			}
+			
 		}
 
 		return Boolean.FALSE;
@@ -94,25 +102,33 @@ public class UserServiceImpl implements UserService {
 	/**
 	 * deleting the user by id
 	 * 
-	 * @param Integer Representative Id
-	 * @return message
+	 * @return Boolean
 	 */
 	public Boolean deleteUserById(Integer userId) {
 		if (userId != null) {
-			repo.deleteById(userId);
-			repo.softDelete(userId);
+			userrepo.deleteById(userId);
+			userrepo.softDelete(userId);
 			return Boolean.TRUE;
 		}
 
 		return Boolean.FALSE;
 	}
 
-	public List<UserEntity> fetchUserByDySearch(DynamicSeachDTO searchEntity) throws CustomException {
 
-		List<UserEntity> usersList = repo.findByFnameOrLastNameAndEmail(searchEntity.getFirstName(),
-				searchEntity.getLastName(), searchEntity.getEmail());
-		return usersList;
 
-	}
+	/**
+	 * fetch the user by First name or LastName
+	 * 
+	 * @return List<UserEntity>
+	 */
+	
+	  public List<UserEntity> fetchUserByDySearch(DynamicSeachDTO searchEntity) {
+	  
+	  List<UserEntity> usersList =
+	  userrepo.findByFirstNameOrLastNameAndEmail(searchEntity.getFirstName(), searchEntity.getLastName()); 
+	  return usersList;
+	  
+	  }
+	 
 
 }
