@@ -2,6 +2,9 @@ package io.reflectoring.booking.business;
 
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.reflectoring.booking.data.Booking;
 import io.reflectoring.booking.data.BookingRepository;
 import io.reflectoring.customer.data.Customer;
@@ -10,6 +13,7 @@ import io.reflectoring.flight.data.Flight;
 import io.reflectoring.flight.data.FlightService;
 
 public class BookingService {
+	Logger log = LoggerFactory.getLogger(this.getClass());
 
 	private BookingRepository bookingRepository;
 
@@ -28,6 +32,8 @@ public class BookingService {
 	 * Books the given flight for the given customer.
 	 */
 	public Booking bookFlight(Long customerId, String flightNumber) {
+		
+		log.info("Inside BookFlight Method........");
 
 		Optional<Customer> customer = customerRepository.findById(customerId);
 		if (!customer.isPresent()) {
